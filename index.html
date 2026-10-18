@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#101827" />
+    <meta name="description" content="A lightweight, installable WebXR AR game prototype." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <title>AR Sphere Hunt — Prototype</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="hud">
+        <div>
+          <p class="eyebrow">AR GAME PROTOTYPE</p>
+          <h1>Sphere Hunt</h1>
+        </div>
+        <div class="score-pill">Collected <strong id="score">0</strong></div>
+      </header>
+
+      <main id="overlay">
+        <section class="intro-card" id="intro-card">
+          <div class="orb-icon" aria-hidden="true"></div>
+          <h2>Find your first orb</h2>
+          <p id="status">Enter AR on a compatible Android device, then slowly move your phone to scan the area.</p>
+          <button id="start-ar" class="primary-button" type="button">Start AR</button>
+          <p class="fine-print" id="compatibility">AR requires a supported browser/device and a secure HTTPS connection.</p>
+        </section>
+        <div class="bottom-hint" id="hint">Prototype: one replaceable 3D sphere</div>
+      </main>
+
+      <a-scene
+        embedded
+        renderer="colorManagement: true; physicallyCorrectLights: true"
+        webxr="optionalFeatures: hit-test, dom-overlay, local-floor; overlayElement: #overlay"
+        ar-mode-ui="enabled: true"
+        vr-mode-ui="enabled: false"
+        loading-screen="enabled: false"
+        background="color: #101827"
+        ar-placement>
+        <a-assets>
+          <a-mixin id="orb-material" material="color: #34D7FF; metalness: 0.35; roughness: 0.2; emissive: #087EA4; emissiveIntensity: 0.6"></a-mixin>
+        </a-assets>
+
+        <a-entity light="type: ambient; intensity: 1.4"></a-entity>
+        <a-entity light="type: directional; intensity: 1.2" position="-1 3 2"></a-entity>
+
+        <a-camera id="camera" position="0 1.6 0" look-controls="enabled: false"></a-camera>
+
+        <a-ring id="reticle"
+          radius-inner="0.12" radius-outer="0.17"
+          rotation="-90 0 0"
+          material="color: #FFFFFF; shader: flat; opacity: 0.9"
+          visible="false"></a-ring>
+
+        <!-- Replace this entity's geometry with gltf-model="#your-model" later.
+             Keep id="game-object" so gameplay can remain model-agnostic. -->
+        <a-entity id="game-object" visible="false" position="0 0 0" collectible>
+          <a-sphere radius="0.16" mixin="orb-material"></a-sphere>
+          <a-sphere radius="0.205" material="color: #34D7FF; shader: flat; wireframe: true; opacity: 0.5; transparent: true"></a-sphere>
+        </a-entity>
+      </a-scene>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
