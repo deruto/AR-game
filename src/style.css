@@ -7,7 +7,8 @@
 }
 html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { background: #101827; }
-a-scene { position: fixed; inset: 0; z-index: 0; }
+a-scene { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100dvh; }
+a-scene canvas { display: block; width: 100% !important; height: 100% !important; }
 .hud {
   position: fixed; z-index: 5; inset: max(16px, env(safe-area-inset-top)) 16px auto;
   display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;

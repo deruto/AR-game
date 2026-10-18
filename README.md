@@ -32,6 +32,8 @@ npm run preview
 - WebXR support check and AR entry UI
 - WebXR hit-test reticle for surface placement
 - Basic collection counter and tap handler
+- Visible 3D preview sphere before starting AR
+- Renderer sizing and deferred XR listener initialization to avoid startup timing issues
 
 ## Replace the sphere later
 
@@ -49,7 +51,8 @@ Add a model asset to `<a-assets>` and point `gltf-model` to its asset selector. 
 
 This is an initial scaffold, not a production-ready game. WebXR immersive AR and hit-test are not available on every phone/browser. iOS support needs a separately tested fallback path. Collection input and AR entry behavior should be tested on the target devices and refined after the first real-device test. PWA installation does not itself enable AR.
 
+## Rendering fix (v0.3)
 
-## Phase 1 notes
+The sphere is visible before AR starts. The scene and canvas have explicit viewport dimensions, and WebXR listeners attach after A-Frame initializes its renderer. These changes address the blank-screen report, but still need to be tested on the target device/browser.
 
-The camera is supplied by the browser's immersive WebXR AR session; the app does not open a second `getUserMedia()` stream. The camera entity has a mouse/touch raycaster for entity taps, while WebXR `select` places the orb after the hit-test reticle finds a surface. Test on a supported Android device over HTTPS. If AR fails, capture the browser console error and device/browser model; WebXR feature support varies by device.
+The camera is supplied by the browser's immersive WebXR AR session; the app does not open a second `getUserMedia()` stream. Test immersive AR on a supported Android device over HTTPS. If AR fails, capture the browser console error and device/browser model; WebXR feature support varies by device.
