@@ -48,3 +48,8 @@ Add a model asset to `<a-assets>` and point `gltf-model` to its asset selector. 
 ## Important limitations / next work
 
 This is an initial scaffold, not a production-ready game. WebXR immersive AR and hit-test are not available on every phone/browser. iOS support needs a separately tested fallback path. Collection input and AR entry behavior should be tested on the target devices and refined after the first real-device test. PWA installation does not itself enable AR.
+
+
+## Phase 1 notes
+
+The camera is supplied by the browser's immersive WebXR AR session; the app does not open a second `getUserMedia()` stream. The camera entity has a mouse/touch raycaster for entity taps, while WebXR `select` places the orb after the hit-test reticle finds a surface. Test on a supported Android device over HTTPS. If AR fails, capture the browser console error and device/browser model; WebXR feature support varies by device.
