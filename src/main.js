@@ -19,7 +19,8 @@ const fallbackRetry = document.querySelector('#fallback-retry');
 
 let score = 0;
 let collected = false;
-let fallbackActive = false;
+let fallbackActive = true;
+document.body.classList.add('fallback-active');
 const setStatus = (message) => { if (statusEl) statusEl.textContent = message; };
 const webxrAvailable = () => window.isSecureContext && 'xr' in navigator;
 
