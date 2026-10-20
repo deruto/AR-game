@@ -32,7 +32,4 @@ p { line-height: 1.5; }
 .fallback-instruction { margin: 10px 0 0; color: #a9c0d3; font-size: 11px; }
 body.ar-active .intro-card, body.ar-active .fallback-game { display: none !important; }
 @media (min-width: 700px) { .intro-card { left: auto; right: 24px; bottom: 28px; width: 390px; } .fallback-game { align-items: flex-end; } .fallback-panel { margin-bottom: 10px; } }
-/* In immersive headset mode, remove flat DOM panels from the user's view. */
-body.vr-active .hud,
-body.vr-active #overlay { display: none !important; }
-body.vr-active a-scene { width: 100vw !important; height: 100vh !important; }
+/* Phone-only fallback: no immersive headset UI. */

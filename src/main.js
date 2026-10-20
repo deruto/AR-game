@@ -16,7 +16,6 @@ const introCard = document.querySelector('#intro-card');
 const fallbackGame = document.querySelector('#fallback-game');
 const fallbackMessage = document.querySelector('#fallback-message');
 const fallbackRetry = document.querySelector('#fallback-retry');
-const fallbackVr = document.querySelector('#fallback-vr');
 
 let score = 0;
 let collected = false;
@@ -47,7 +46,6 @@ function showFallback(message) {
   hintEl.textContent = '3D adventure mode — drag to look around.';
   startButton.disabled = false;
   startButton.textContent = 'Start AR';
-  updateVrButton();
 }
 
 function hideFallback() {
@@ -58,16 +56,6 @@ function hideFallback() {
   if (vrCollectible) vrCollectible.object3D.visible = false;
   introCard.hidden = false;
   camera.setAttribute('look-controls', 'enabled', false);
-}
-
-async function updateVrButton() {
-  if (!fallbackVr) return;
-  try {
-    const supported = webxrAvailable() && await navigator.xr.isSessionSupported('immersive-vr');
-    fallbackVr.hidden = !supported;
-  } catch {
-    fallbackVr.hidden = true;
-  }
 }
 
 if (!window.isSecureContext) {
@@ -81,37 +69,6 @@ if (!window.isSecureContext) {
 fallbackRetry.addEventListener('click', () => {
   hideFallback();
   startButton.click();
-});
-
-fallbackVr.addEventListener('click', async () => {
-  fallbackVr.disabled = true;
-  fallbackVr.textContent = 'Starting headset…';
-  try {
-    if (typeof scene.enterVR !== 'function') throw new Error('A-Frame VR entry point is not available');
-    await scene.enterVR();
-  } catch (error) {
-    console.warn('Unable to enter headset VR:', error);
-    fallbackMessage.textContent = 'Headset VR could not start. Continue in the on-screen 3D scene.';
-  } finally {
-    fallbackVr.disabled = false;
-    fallbackVr.textContent = 'Enter VR headset';
-  }
-});
-
-// Align the chamber with the direction the headset is facing when VR begins.
-// Without this, the player may be facing away from the room and see only the dark sky.
-scene.addEventListener('enter-vr', () => {
-  document.body.classList.add('vr-active');
-  window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-    if (!scene.is('vr-mode') || !fallbackWorld.object3D.visible) return;
-    const direction = new THREE.Vector3();
-    camera.object3D.getWorldDirection(direction);
-    fallbackWorld.object3D.rotation.y = Math.atan2(-direction.x, -direction.z);
-  }));
-});
-scene.addEventListener('exit-vr', () => {
-  document.body.classList.remove('vr-active');
-  fallbackWorld.object3D.rotation.y = 0;
 });
 
 startButton.addEventListener('click', async () => {
@@ -262,6 +219,13 @@ AFRAME.registerComponent('collectible', {
     }, 300);
   }
 });
+
+// Start the on-screen A-Frame fallback as soon as the scene is ready.
+function startPhoneFallback() {
+  showFallback('Phone 3D mode is ready. Drag to look around and tap the glowing orb to collect it. AR is optional.');
+}
+if (scene.hasLoaded) startPhoneFallback();
+else scene.addEventListener('loaded', startPhoneFallback, { once: true });
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

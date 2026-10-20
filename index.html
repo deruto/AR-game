@@ -29,7 +29,6 @@
             <h2>Explore the orb chamber</h2>
             <p class="fallback-copy" id="fallback-message">Drag to look around and tap the glowing orb to collect it.</p>
             <div class="fallback-actions">
-              <button id="fallback-vr" class="secondary-button" type="button" hidden>Enter VR headset</button>
               <button id="fallback-retry" class="primary-button" type="button">Try AR again</button>
             </div>
             <p class="fallback-instruction">Drag to look · Tap the orb to collect</p>
@@ -42,7 +41,7 @@
         renderer="colorManagement: true; physicallyCorrectLights: true"
         webxr="optionalFeatures: hit-test, dom-overlay, local-floor; overlayElement: #overlay"
         ar-mode-ui="enabled: true"
-        vr-mode-ui="enabled: true"
+        vr-mode-ui="enabled: false"
         loading-screen="enabled: false"
         background="color: #081426"
         ar-placement>
