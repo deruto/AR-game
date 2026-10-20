@@ -11,6 +11,7 @@ const camera = document.querySelector('#camera');
 const gameObject = document.querySelector('#game-object');
 const reticle = document.querySelector('#reticle');
 const fallbackWorld = document.querySelector('#fallback-world');
+const vrCollectible = document.querySelector('#vr-collectible');
 const introCard = document.querySelector('#intro-card');
 const fallbackGame = document.querySelector('#fallback-game');
 const fallbackMessage = document.querySelector('#fallback-message');
@@ -30,8 +31,14 @@ function showFallback(message) {
   fallbackGame.hidden = false;
   introCard.hidden = true;
   fallbackWorld.setAttribute('visible', true);
-  gameObject.object3D.visible = true;
-  gameObject.object3D.position.set(0, 1.6, -2.5);
+  // In fallback mode use the dedicated orb inside the 3D chamber, not the AR-placement orb.
+  gameObject.object3D.visible = false;
+  if (vrCollectible) {
+    vrCollectible.object3D.visible = true;
+    vrCollectible.object3D.position.set(0, 1.6, -2.5);
+    vrCollectible.object3D.scale.set(1, 1, 1);
+    vrCollectible.dataset.collected = 'false';
+  }
   gameObject.object3D.scale.set(1, 1, 1);
   gameObject.dataset.collected = 'false';
   camera.setAttribute('look-controls', 'enabled', true);
@@ -48,6 +55,7 @@ function hideFallback() {
   document.body.classList.remove('fallback-active');
   fallbackGame.hidden = true;
   fallbackWorld.setAttribute('visible', false);
+  if (vrCollectible) vrCollectible.object3D.visible = false;
   introCard.hidden = false;
   camera.setAttribute('look-controls', 'enabled', false);
 }
@@ -76,13 +84,34 @@ fallbackRetry.addEventListener('click', () => {
 });
 
 fallbackVr.addEventListener('click', async () => {
+  fallbackVr.disabled = true;
+  fallbackVr.textContent = 'Starting headset…';
   try {
-    if (typeof scene.enterVR === 'function') await scene.enterVR();
-    else throw new Error('A-Frame VR entry point is not available');
+    if (typeof scene.enterVR !== 'function') throw new Error('A-Frame VR entry point is not available');
+    await scene.enterVR();
   } catch (error) {
     console.warn('Unable to enter headset VR:', error);
-    fallbackMessage.textContent = 'Headset VR could not start on this device. The 3D scene remains playable on screen.';
+    fallbackMessage.textContent = 'Headset VR could not start. Continue in the on-screen 3D scene.';
+  } finally {
+    fallbackVr.disabled = false;
+    fallbackVr.textContent = 'Enter VR headset';
   }
+});
+
+// Align the chamber with the direction the headset is facing when VR begins.
+// Without this, the player may be facing away from the room and see only the dark sky.
+scene.addEventListener('enter-vr', () => {
+  document.body.classList.add('vr-active');
+  window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+    if (!scene.is('vr-mode') || !fallbackWorld.object3D.visible) return;
+    const direction = new THREE.Vector3();
+    camera.object3D.getWorldDirection(direction);
+    fallbackWorld.object3D.rotation.y = Math.atan2(-direction.x, -direction.z);
+  }));
+});
+scene.addEventListener('exit-vr', () => {
+  document.body.classList.remove('vr-active');
+  fallbackWorld.object3D.rotation.y = 0;
 });
 
 startButton.addEventListener('click', async () => {
@@ -133,6 +162,7 @@ AFRAME.registerComponent('ar-placement', {
       hideFallback();
       document.body.classList.add('ar-active');
       fallbackWorld.setAttribute('visible', false);
+      if (vrCollectible) vrCollectible.object3D.visible = false;
       camera.setAttribute('look-controls', 'enabled', false);
       try {
         const viewerSpace = await session.requestReferenceSpace('viewer');
@@ -166,9 +196,15 @@ AFRAME.registerComponent('ar-placement', {
       this.hasSurface = false;
       this.placed = false;
       reticle.object3D.visible = false;
-      gameObject.object3D.visible = true;
-      gameObject.object3D.position.set(0, 1.6, -2.5);
-      camera.setAttribute('look-controls', 'enabled', false);
+      if (fallbackActive) {
+        gameObject.object3D.visible = false;
+        fallbackWorld.setAttribute('visible', true);
+        if (vrCollectible) vrCollectible.object3D.visible = true;
+      } else {
+        gameObject.object3D.visible = true;
+        gameObject.object3D.position.set(0, 1.6, -2.5);
+      }
+      camera.setAttribute('look-controls', 'enabled', fallbackActive);
       startButton.disabled = false;
       startButton.textContent = 'Start AR';
       if (!fallbackActive) {

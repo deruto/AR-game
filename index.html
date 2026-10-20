@@ -42,7 +42,7 @@
         renderer="colorManagement: true; physicallyCorrectLights: true"
         webxr="optionalFeatures: hit-test, dom-overlay, local-floor; overlayElement: #overlay"
         ar-mode-ui="enabled: true"
-        vr-mode-ui="enabled: false"
+        vr-mode-ui="enabled: true"
         loading-screen="enabled: false"
         background="color: #081426"
         ar-placement>
@@ -58,6 +58,12 @@
           <a-entity position="-1.8 0 -3.6"><a-box width="0.18" height="1.2" depth="0.18" material="color: #123650; metalness: 0.3"></a-box><a-sphere position="0 0.72 0" radius="0.12" material="color: #34D7FF; emissive: #087EA4; emissiveIntensity: 1.2"></a-sphere></a-entity>
           <a-entity position="1.8 0 -3.6"><a-box width="0.18" height="1.7" depth="0.18" material="color: #123650; metalness: 0.3"></a-box><a-sphere position="0 0.95 0" radius="0.12" material="color: #A66BFF; emissive: #5020A0; emissiveIntensity: 1.2"></a-sphere></a-entity>
           <a-entity position="0 2.9 -4.5"><a-octahedron radius="0.12" material="color: #34D7FF; emissive: #087EA4; emissiveIntensity: 1.3"></a-octahedron></a-entity>
+          <a-entity id="vr-collectible" position="0 1.6 -2.5" collectible>
+            <a-sphere class="collectible-mesh" radius="0.22" material="color: #34D7FF; metalness: 0.15; roughness: 0.2; emissive: #087EA4; emissiveIntensity: 1.2"></a-sphere>
+            <a-sphere class="collectible-mesh" radius="0.29" material="color: #34D7FF; shader: flat; wireframe: true; opacity: 0.65; transparent: true"></a-sphere>
+            <a-torus radius="0.4" radius-tubular="0.018" material="color: #7CEBFF; shader: flat; opacity: 0.95; transparent: true" animation="property: rotation; to: 0 360 360; loop: true; dur: 5000; easing: linear"></a-torus>
+            <a-light type="point" color="#34D7FF" intensity="2.5" distance="5"></a-light>
+          </a-entity>
           <a-entity position="-2.8 1.8 -5"><a-sphere radius="0.035" material="color: #D9F7FF; shader: flat"></a-sphere></a-entity>
           <a-entity position="2.7 2.4 -5.4"><a-sphere radius="0.045" material="color: #D9F7FF; shader: flat"></a-sphere></a-entity>
           <a-entity position="-1.3 3.1 -6"><a-sphere radius="0.03" material="color: #A66BFF; shader: flat"></a-sphere></a-entity>
