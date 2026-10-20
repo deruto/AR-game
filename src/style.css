@@ -1,7 +1,7 @@
 * { box-sizing: border-box; }
-:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #f8fafc; background: #101827; }
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #f8fafc; background: #081426; }
 html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
-body { background: #101827; }
+body { background: #081426; }
 a-scene { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100dvh; }
 a-scene canvas { display: block; width: 100% !important; height: 100% !important; }
 .hud { position: fixed; z-index: 5; inset: max(16px, env(safe-area-inset-top)) 16px auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; pointer-events: none; }
@@ -15,20 +15,20 @@ h1 { margin: 0; font-size: clamp(23px, 6vw, 32px); letter-spacing: -.04em; }
 h2 { margin: 0 0 8px; font-size: 22px; }
 p { line-height: 1.5; }
 #status { margin: 0 0 14px; color: #c3d0df; font-size: 14px; }
-.primary-button, .secondary-button { width: 100%; min-height: 48px; border: 0; border-radius: 14px; font: inherit; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+.primary-button, .secondary-button { width: 100%; min-height: 46px; padding: 10px 14px; border: 0; border-radius: 14px; font: inherit; font-weight: 800; cursor: pointer; touch-action: manipulation; }
 .primary-button { color: #07131d; background: #34d7ff; }
-.secondary-button { margin-top: 18px; color: #e7f6ff; background: #ffffff14; border: 1px solid #ffffff26; }
+.secondary-button { color: #e7f6ff; background: #ffffff14; border: 1px solid #ffffff26; }
 .primary-button:active, .secondary-button:active { transform: scale(.99); }
 .fine-print { margin: 12px 0 0; color: #8394aa; font-size: 11px; }
 .bottom-hint { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 16px; right: 16px; text-align: center; color: #d7e2ef; font-size: 12px; text-shadow: 0 1px 8px #000; }
-.fallback-game { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 90px 24px 72px; text-align: center; pointer-events: auto; background: radial-gradient(ellipse at center, #18384b 0%, #101827 65%); }
+.fallback-game { position: absolute; z-index: 4; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 90px 16px max(54px, env(safe-area-inset-bottom)); pointer-events: none; }
 .fallback-game[hidden], .intro-card[hidden] { display: none !important; }
-.fallback-label { margin: 0 0 12px; color: #34d7ff; font-size: 11px; font-weight: 900; letter-spacing: .2em; }
-.fallback-copy { max-width: 320px; margin: 0 0 26px; color: #c3d0df; font-size: 14px; }
-.fallback-orb { display: grid; place-items: center; width: 142px; height: 142px; border: 0; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #effdff 0%, #8ceeff 12%, #34d7ff 33%, #087ea4 68%, #06334b 100%); box-shadow: 0 0 28px #34d7ff70, 0 0 80px #34d7ff35, inset -10px -12px 24px #001d3b70; cursor: pointer; touch-action: manipulation; }
-.fallback-orb span { width: 166px; height: 166px; border: 1px solid #34d7ff90; border-radius: 50%; box-shadow: 0 0 18px #34d7ff40; }
-.fallback-orb.collected { animation: orb-pop .32s ease-out; }
-@keyframes orb-pop { 50% { transform: scale(.78); filter: brightness(1.7); } }
-.fallback-instruction { margin: 22px 0 0; color: #f8fafc; font-size: 14px; font-weight: 700; }
+.fallback-panel { width: min(100%, 480px); padding: 17px 18px 14px; border: 1px solid #ffffff24; border-radius: 22px; background: linear-gradient(135deg, #101827e8, #0b2235e8); box-shadow: 0 12px 48px #0006; backdrop-filter: blur(12px); text-align: center; pointer-events: auto; }
+.fallback-label { margin: 0 0 7px; color: #34d7ff; font-size: 10px; font-weight: 900; letter-spacing: .2em; }
+.fallback-panel h2 { font-size: 20px; }
+.fallback-copy { max-width: 360px; margin: 0 auto 12px; color: #c3d0df; font-size: 13px; }
+.fallback-actions { display: flex; gap: 10px; }
+.fallback-actions button { flex: 1; }
+.fallback-instruction { margin: 10px 0 0; color: #a9c0d3; font-size: 11px; }
 body.ar-active .intro-card, body.ar-active .fallback-game { display: none !important; }
-@media (min-width: 700px) { .intro-card { left: auto; right: 24px; bottom: 28px; width: 390px; } }
+@media (min-width: 700px) { .intro-card { left: auto; right: 24px; bottom: 28px; width: 390px; } .fallback-game { align-items: flex-end; } .fallback-panel { margin-bottom: 10px; } }

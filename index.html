@@ -19,17 +19,21 @@
         <section class="intro-card" id="intro-card">
           <div class="orb-icon" aria-hidden="true"></div>
           <h2>Find your first orb</h2>
-          <p id="status">Start in preview mode, or enter AR on a supported device.</p>
+          <p id="status">Start in 3D preview mode, or enter AR on a supported device.</p>
           <button id="start-ar" class="primary-button" type="button">Start AR</button>
-          <p class="fine-print" id="compatibility">The game preview works without AR. Immersive AR needs a supported browser/device and HTTPS.</p>
+          <p class="fine-print" id="compatibility">The 3D game works without AR. Immersive AR needs a supported browser/device and HTTPS.</p>
         </section>
-        <section id="fallback-game" class="fallback-game" hidden aria-label="Fallback orb game">
-          <p class="fallback-label">PREVIEW MODE</p>
-          <h2>AR isn't available here</h2>
-          <p class="fallback-copy" id="fallback-message">You can still play the orb-collection preview.</p>
-          <button id="fallback-orb" class="fallback-orb" type="button" aria-label="Collect the glowing orb"><span></span></button>
-          <p class="fallback-instruction" id="fallback-instruction">Tap the orb to collect it</p>
-          <button id="fallback-retry" class="secondary-button" type="button">Try AR again</button>
+        <section id="fallback-game" class="fallback-game" hidden aria-label="A-Frame 3D fallback game">
+          <div class="fallback-panel">
+            <p class="fallback-label">3D ADVENTURE MODE</p>
+            <h2>Explore the orb chamber</h2>
+            <p class="fallback-copy" id="fallback-message">Drag to look around and tap the glowing orb to collect it.</p>
+            <div class="fallback-actions">
+              <button id="fallback-vr" class="secondary-button" type="button" hidden>Enter VR headset</button>
+              <button id="fallback-retry" class="primary-button" type="button">Try AR again</button>
+            </div>
+            <p class="fallback-instruction">Drag to look · Tap the orb to collect</p>
+          </div>
         </section>
         <div class="bottom-hint" id="hint">Prototype: one replaceable 3D sphere</div>
       </main>
@@ -40,20 +44,37 @@
         ar-mode-ui="enabled: true"
         vr-mode-ui="enabled: false"
         loading-screen="enabled: false"
-        background="color: #182235"
+        background="color: #081426"
         ar-placement>
         <a-assets>
           <a-mixin id="orb-material" material="color: #34D7FF; metalness: 0.35; roughness: 0.2; emissive: #087EA4; emissiveIntensity: 0.6"></a-mixin>
         </a-assets>
+        <a-entity id="fallback-world" visible="false">
+          <a-sky color="#081426"></a-sky>
+          <a-plane rotation="-90 0 0" width="100" height="100" material="color: #0C1E32; roughness: 0.9"></a-plane>
+          <a-circle position="0 0.015 -2.5" rotation="-90 0 0" radius="2.4" material="color: #0A3C54; shader: flat; opacity: 0.55; transparent: true"></a-circle>
+          <a-torus position="0 0.03 -2.5" rotation="-90 0 0" radius="1.55" radius-tubular="0.012" material="color: #20C8F4; emissive: #087EA4; emissiveIntensity: 0.8"></a-torus>
+          <a-torus position="0 0.04 -2.5" rotation="-90 0 0" radius="2.05" radius-tubular="0.008" material="color: #3476A6; emissive: #123C63"></a-torus>
+          <a-entity position="-1.8 0 -3.6"><a-box width="0.18" height="1.2" depth="0.18" material="color: #123650; metalness: 0.3"></a-box><a-sphere position="0 0.72 0" radius="0.12" material="color: #34D7FF; emissive: #087EA4; emissiveIntensity: 1.2"></a-sphere></a-entity>
+          <a-entity position="1.8 0 -3.6"><a-box width="0.18" height="1.7" depth="0.18" material="color: #123650; metalness: 0.3"></a-box><a-sphere position="0 0.95 0" radius="0.12" material="color: #A66BFF; emissive: #5020A0; emissiveIntensity: 1.2"></a-sphere></a-entity>
+          <a-entity position="0 2.9 -4.5"><a-octahedron radius="0.12" material="color: #34D7FF; emissive: #087EA4; emissiveIntensity: 1.3"></a-octahedron></a-entity>
+          <a-entity position="-2.8 1.8 -5"><a-sphere radius="0.035" material="color: #D9F7FF; shader: flat"></a-sphere></a-entity>
+          <a-entity position="2.7 2.4 -5.4"><a-sphere radius="0.045" material="color: #D9F7FF; shader: flat"></a-sphere></a-entity>
+          <a-entity position="-1.3 3.1 -6"><a-sphere radius="0.03" material="color: #A66BFF; shader: flat"></a-sphere></a-entity>
+          <a-entity position="1.2 1.9 -6.5"><a-sphere radius="0.035" material="color: #34D7FF; shader: flat"></a-sphere></a-entity>
+        </a-entity>
         <a-entity light="type: ambient; intensity: 1.4"></a-entity>
         <a-entity light="type: directional; intensity: 1.2" position="-1 3 2"></a-entity>
+        <a-entity light="type: point; intensity: 1.5; distance: 8; color: #20C8F4" position="0 2 -2.5"></a-entity>
         <a-camera id="camera" position="0 1.6 0" look-controls="enabled: false"
-          cursor="rayOrigin: mouse; fuse: false" raycaster="objects: #game-object; far: 8"></a-camera>
+          cursor="rayOrigin: mouse; fuse: false" raycaster="objects: .collectible-mesh; far: 8"></a-camera>
         <a-ring id="reticle" radius-inner="0.12" radius-outer="0.17" rotation="-90 0 0"
           material="color: #FFFFFF; shader: flat; opacity: 0.9" visible="false"></a-ring>
-        <a-entity id="game-object" visible="true" position="0 1.1 -2.2" collectible>
-          <a-sphere radius="0.16" mixin="orb-material"></a-sphere>
-          <a-sphere radius="0.205" material="color: #34D7FF; shader: flat; wireframe: true; opacity: 0.5; transparent: true"></a-sphere>
+        <!-- Swap the sphere meshes for a GLB/GLTF model later; keep the parent ID and collectible component. -->
+        <a-entity id="game-object" visible="true" position="0 1.6 -2.5" collectible>
+          <a-sphere class="collectible-mesh" radius="0.22" mixin="orb-material"></a-sphere>
+          <a-sphere class="collectible-mesh" radius="0.28" material="color: #34D7FF; shader: flat; wireframe: true; opacity: 0.5; transparent: true"></a-sphere>
+          <a-torus radius="0.38" radius-tubular="0.012" material="color: #7CEBFF; shader: flat; opacity: 0.85; transparent: true" animation="property: rotation; to: 0 360 360; loop: true; dur: 7000; easing: linear"></a-torus>
         </a-entity>
       </a-scene>
     </div>

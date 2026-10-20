@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sphere-hunt-shell-v3';
+const CACHE_NAME = 'sphere-hunt-shell-v4';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -19,7 +19,6 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // HTML and app modules must revalidate; otherwise a broken old bundle can persist forever.
   const isAppCode = url.pathname === '/' || url.pathname.endsWith('.html') ||
     url.pathname.endsWith('.js') || url.pathname.endsWith('.css') ||
     url.pathname.endsWith('.webmanifest');
