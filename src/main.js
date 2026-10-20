@@ -9,32 +9,72 @@ const hintEl = document.querySelector('#hint');
 const scene = document.querySelector('a-scene');
 const gameObject = document.querySelector('#game-object');
 const reticle = document.querySelector('#reticle');
+const introCard = document.querySelector('#intro-card');
+const fallbackGame = document.querySelector('#fallback-game');
+const fallbackMessage = document.querySelector('#fallback-message');
+const fallbackOrb = document.querySelector('#fallback-orb');
+const fallbackRetry = document.querySelector('#fallback-retry');
+const fallbackInstruction = document.querySelector('#fallback-instruction');
 
 let score = 0;
 let collected = false;
+let fallbackActive = false;
 const setStatus = (message) => { if (statusEl) statusEl.textContent = message; };
 const webxrAvailable = () => window.isSecureContext && 'xr' in navigator;
 
-if (!window.isSecureContext) {
-  compatibilityEl.textContent = '3D preview is available. Use HTTPS (or localhost during development) to enable AR.';
-} else if (!('xr' in navigator)) {
-  compatibilityEl.textContent = '3D preview mode: this browser does not expose WebXR immersive AR.';
-} else {
-  compatibilityEl.textContent = '3D preview is ready. Device AR support will be checked when you press Start AR.';
+function showFallback(message) {
+  fallbackActive = true;
+  document.body.classList.add('fallback-active');
+  fallbackGame.hidden = false;
+  introCard.hidden = true;
+  fallbackMessage.textContent = message;
+  fallbackInstruction.textContent = 'Tap the glowing orb to collect it';
+  startButton.disabled = false;
+  startButton.textContent = 'Start AR';
+  hintEl.textContent = 'Preview mode is active — no AR required.';
 }
+
+function hideFallback() {
+  fallbackActive = false;
+  document.body.classList.remove('fallback-active');
+  fallbackGame.hidden = true;
+  introCard.hidden = false;
+}
+
+if (!window.isSecureContext) {
+  compatibilityEl.textContent = 'Preview mode works here. Use HTTPS (or localhost during development) to enable AR.';
+} else if (!('xr' in navigator)) {
+  compatibilityEl.textContent = 'This browser does not expose WebXR AR. You can still play the preview.';
+} else {
+  compatibilityEl.textContent = 'Preview works without AR. Device support will be checked when you press Start AR.';
+}
+
+fallbackOrb.addEventListener('click', () => {
+  score += 1;
+  scoreEl.textContent = String(score);
+  fallbackOrb.classList.remove('collected');
+  void fallbackOrb.offsetWidth;
+  fallbackOrb.classList.add('collected');
+  fallbackInstruction.textContent = 'Collected! Tap again for another orb.';
+  setStatus('Orb collected in preview mode.');
+});
+
+fallbackRetry.addEventListener('click', () => {
+  hideFallback();
+  startButton.click();
+});
 
 startButton.addEventListener('click', async () => {
   if (!webxrAvailable()) {
-    setStatus('The 3D scene works without AR. For immersive AR, use HTTPS and a browser/device with WebXR support.');
+    showFallback('WebXR AR is unavailable in this browser or page context. The preview game works without it.');
     return;
   }
   startButton.disabled = true;
   startButton.textContent = 'Checking device…';
   try {
-    if (!(await navigator.xr.isSessionSupported('immersive-ar'))) {
-      setStatus('Immersive AR is not supported on this browser/device. The 3D preview remains available.');
-      startButton.disabled = false;
-      startButton.textContent = 'Try AR again';
+    const supported = await navigator.xr.isSessionSupported('immersive-ar');
+    if (!supported) {
+      showFallback('This device/browser does not support immersive AR. Play the preview below instead.');
       return;
     }
     setStatus('Starting AR… approve any browser prompts.');
@@ -46,9 +86,7 @@ startButton.addEventListener('click', async () => {
     }
   } catch (error) {
     console.error('Unable to start immersive AR:', error);
-    setStatus('Could not start AR. The 3D preview should remain available. Check permissions and HTTPS.');
-    startButton.disabled = false;
-    startButton.textContent = 'Try AR again';
+    showFallback('AR could not start. You can keep playing here without camera or AR permissions.');
   }
 });
 
@@ -62,8 +100,6 @@ AFRAME.registerComponent('ar-placement', {
     this.xrManager = null;
     this.onSessionStart = null;
     this.onSessionEnd = null;
-
-    // A-Frame's renderer is initialized asynchronously; defer XR access.
     this.el.sceneEl.addEventListener('renderstart', () => this.attachXRListeners(), { once: true });
     if (this.el.sceneEl.renderer) this.attachXRListeners();
   },
@@ -73,6 +109,7 @@ AFRAME.registerComponent('ar-placement', {
     this.onSessionStart = async () => {
       const session = this.xrManager.getSession();
       if (!session) return;
+      hideFallback();
       document.body.classList.add('ar-active');
       try {
         const viewerSpace = await session.requestReferenceSpace('viewer');
@@ -95,7 +132,7 @@ AFRAME.registerComponent('ar-placement', {
         setStatus('Move your phone slowly to scan. When the reticle appears, tap to place the orb.');
       } catch (error) {
         console.error('Hit-test setup failed:', error);
-        setStatus('AR started, but surface detection could not initialize. The 3D preview remains available.');
+        showFallback('AR opened, but surface detection failed. Exit AR if needed and use this preview instead.');
       }
     };
     this.onSessionEnd = () => {
@@ -108,10 +145,12 @@ AFRAME.registerComponent('ar-placement', {
       reticle.object3D.visible = false;
       gameObject.object3D.visible = true;
       gameObject.object3D.position.set(0, 1.1, -2.2);
-      setStatus('AR session ended. The 3D preview is still available.');
-      hintEl.textContent = '3D preview: tap the sphere to test collection.';
       startButton.disabled = false;
       startButton.textContent = 'Start AR';
+      if (!fallbackActive) {
+        setStatus('AR session ended. You can use the 3D preview or start AR again.');
+        hintEl.textContent = '3D preview: tap the sphere to test collection.';
+      }
     };
     this.xrManager.addEventListener('sessionstart', this.onSessionStart);
     this.xrManager.addEventListener('sessionend', this.onSessionEnd);
@@ -148,9 +187,7 @@ AFRAME.registerComponent('collectible', {
     score += 1;
     scoreEl.textContent = String(score);
     setStatus('Orb collected! The prototype will make it available again.');
-    this.el.setAttribute('animation__collect', {
-      property: 'scale', to: '0.001 0.001 0.001', dur: 220, easing: 'easeInQuad'
-    });
+    this.el.setAttribute('animation__collect', { property: 'scale', to: '0.001 0.001 0.001', dur: 220, easing: 'easeInQuad' });
     window.setTimeout(() => {
       this.el.removeAttribute('animation__collect');
       this.el.object3D.scale.set(1, 1, 1);
